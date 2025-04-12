@@ -5,7 +5,7 @@ const router = createRouter({
   // import.meta.env.BASE_URL是vite中的路由基准地址 vite.config.js中的base
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/login', component: () => import('@/views/login/loginPage.vue') },
+    { path: '/login', component: () => import('@/views/login/LoginPage.vue') },
     {
       path: '/',
       component: () => import('@/views/layout/LayoutPage.vue'),
