@@ -2,6 +2,7 @@
 import { Delete, Edit } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import ChannelSelect from './components/ChannelSelect.vue'
+import ArticleEdit from './components/ArticleEdit.vue'
 // import { artGetListService } from '@/api/article'
 // 日期格式化
 import { formatTime } from '@/utils/format'
@@ -43,9 +44,7 @@ const params = ref({
 // }
 // getArticleList()
 
-const onEditArticle = (row) => {
-  console.log(row)
-}
+// 删除文章
 const onDeleteArticle = (row) => {
   console.log(row)
 }
@@ -76,14 +75,25 @@ const onReset = () => {
   params.value.cate_id = ''
   params.value.state = ''
   console.log('触发重置')
-    // getArticleList()
+  // getArticleList()
+}
+
+// 控制抽屉组件
+const articleEditRef = ref()
+// 发布文章
+const onAddArticle = () => {
+  articleEditRef.value.open({})
+}
+// 编辑文章
+const onEditArticle = (row) => {
+  articleEditRef.value.open(row)
 }
 </script>
 
 <template>
   <page-container title="文章管理">
     <template #extra>
-      <el-button type="primary">发布文章</el-button>
+      <el-button @click="onAddArticle" type="primary">发布文章</el-button>
     </template>
 
     <!-- 表单区域 -->
@@ -141,9 +151,8 @@ const onReset = () => {
     </el-table>
 
     <!-- 分页区域 -->
-    <div>
-      <!-- page-sizes必须包含params中的pagesize -->
-      <el-pagination
+    <!-- page-sizes必须包含params中的pagesize -->
+    <el-pagination
       v-model:current-page="params.pagenum"
       v-model:page-size="params.pagesize"
       :page-sizes="[2, 3, 5, 10]"
@@ -154,6 +163,9 @@ const onReset = () => {
       @size-change="onSizeChange"
       @current-change="onCurrentChange"
     />
-    </div>
+
+    <!-- 抽屉区域 -->
+    <article-edit ref="articleEditRef"></article-edit>
+
   </page-container>
 </template>
