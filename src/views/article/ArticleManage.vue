@@ -2,6 +2,9 @@
 import { Delete, Edit } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import ChannelSelect from './components/ChannelSelect.vue'
+// import { artGetListService } from '@/api/article'
+// 日期格式化
+import { formatTime } from '@/utils/format'
 // 假数据
 const articleList = ref([
   {
@@ -20,6 +23,26 @@ const articleList = ref([
   },
 ])
 
+// 父组件传递给子组件
+const params = ref({
+  pagenum: 1, // 当前页
+  pagesize: 5, // 当前页生效的条数
+  cate_id: '',
+  state: '',
+})
+// 动态渲染
+// const articleList = ref([])
+// const total = ref(0)
+
+// const getArticleList = async () => {
+//   loading.value = true
+//   const res = await artGetListService(params.value)
+//   articleList.value = res.data.data
+//   total.value = res.data.total
+//   loading.value = false
+// }
+// getArticleList()
+
 const onEditArticle = (row) => {
   console.log(row)
 }
@@ -27,13 +50,34 @@ const onDeleteArticle = (row) => {
   console.log(row)
 }
 
-// 父组件传递给子组件
-const params = ref({
-  pagenum: 1,
-  pagesize: 5,
-  cate_id: '',
-  state: '',
-})
+// 分页逻辑
+const onSizeChange = (size) => {
+  params.value.pagenum = 1
+  params.value.pagesize = size
+  // getArticleList()
+}
+const onCurrentChange = (page) => {
+  params.value.pagenum = page
+  // getArticleList()
+}
+
+// loading效果
+const loading = ref(false)
+
+// 搜索逻辑--按照最新条件从第一页开始展示
+const onSearch = () => {
+  params.value.pagenum = 1
+  console.log('触发搜索')
+  // getArticleList()
+}
+// 重置逻辑
+const onReset = () => {
+  params.value.pagenum = 1
+  params.value.cate_id = ''
+  params.value.state = ''
+  console.log('触发重置')
+    // getArticleList()
+}
 </script>
 
 <template>
@@ -54,13 +98,13 @@ const params = ref({
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">搜索</el-button>
-        <el-button>重置</el-button>
+        <el-button @click="onSearch" type="primary">搜索</el-button>
+        <el-button @click="onReset">重置</el-button>
       </el-form-item>
     </el-form>
 
     <!-- 内容区域 -->
-    <el-table :data="articleList" style="width: 100%">
+    <el-table v-loading="loading" :data="articleList" style="width: 100%">
       <el-table-column label="文章标题" width="400">
         <!-- 链接高亮效果--type="primary"默认是蓝色 -->
         <template #default="{ row }">
@@ -68,7 +112,9 @@ const params = ref({
         </template>
       </el-table-column>
       <el-table-column label="分类" prop="cate_name"></el-table-column>
-      <el-table-column label="发表时间" prop="pub_date"> </el-table-column>
+      <el-table-column label="发表时间" prop="pub_date">
+        <template #default="{ row }">{{ formatTime(row.pub_date) }}</template>
+      </el-table-column>
       <el-table-column label="状态" prop="state"></el-table-column>
       <!-- 利用作用域插槽row可以获取当前行的数据(更灵活) => v-for 遍历item -->
       <el-table-column label="操作" width="100">
@@ -93,5 +139,21 @@ const params = ref({
         <el-empty description="没有数据" />
       </template>
     </el-table>
+
+    <!-- 分页区域 -->
+    <div>
+      <!-- page-sizes必须包含params中的pagesize -->
+      <el-pagination
+      v-model:current-page="params.pagenum"
+      v-model:page-size="params.pagesize"
+      :page-sizes="[2, 3, 5, 10]"
+      :size="size"
+      :background="background"
+      layout="jumper, total, sizes, prev, pager, next"
+      :total="10"
+      @size-change="onSizeChange"
+      @current-change="onCurrentChange"
+    />
+    </div>
   </page-container>
 </template>
