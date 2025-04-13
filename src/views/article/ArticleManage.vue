@@ -3,7 +3,9 @@ import { Delete, Edit } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import ChannelSelect from './components/ChannelSelect.vue'
 import ArticleEdit from './components/ArticleEdit.vue'
+import { artDelService } from '@/api/article'
 // import { artGetListService } from '@/api/article'
+import { ElMessage, ElMessageBox } from 'element-plus'
 // 日期格式化
 import { formatTime } from '@/utils/format'
 // 假数据
@@ -24,6 +26,9 @@ const articleList = ref([
   },
 ])
 
+// 文章总条数
+const total = ref(0)
+
 // 父组件传递给子组件
 const params = ref({
   pagenum: 1, // 当前页
@@ -43,11 +48,6 @@ const params = ref({
 //   loading.value = false
 // }
 // getArticleList()
-
-// 删除文章
-const onDeleteArticle = (row) => {
-  console.log(row)
-}
 
 // 分页逻辑
 const onSizeChange = (size) => {
@@ -87,6 +87,30 @@ const onAddArticle = () => {
 // 编辑文章
 const onEditArticle = (row) => {
   articleEditRef.value.open(row)
+}
+
+// 删除文章
+const onDeleteArticle = async (row) => {
+  await ElMessageBox.confirm('你确认删除该文章信息吗？', '温馨提示', {
+    type: 'warning',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+  })
+  await artDelService(row.id)
+  ElMessage({ type: 'success', message: '删除成功' })
+  // getArticleList()
+}
+
+// 添加文章成功
+const onSuccess = (type) => {
+  if (type === 'add') {
+    // 添加文章，跳转到最后一页
+    // 向上取整
+    const lastPage = Math.ceil(total.value + 1) / params.value.pagesize
+    params.value.pagenum = lastPage
+  }
+  // 编辑文章，直接渲染当前页面
+  // getActiveList()
 }
 </script>
 
@@ -165,7 +189,6 @@ const onEditArticle = (row) => {
     />
 
     <!-- 抽屉区域 -->
-    <article-edit ref="articleEditRef"></article-edit>
-
+    <article-edit @success="onSuccess" ref="articleEditRef"></article-edit>
   </page-container>
 </template>

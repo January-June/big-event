@@ -24,5 +24,25 @@ export const artDelChannelsService = (id) => {
 
 // 文章内容有关
 export const artGetListService = (params) => {
-  request.get('/my/article/list', {params})
+  request.get('/my/article/list', { params })
+}
+
+// 文章发布
+export const artPublishService = (data) => {
+  request.post('/my/article/add', data)
+}
+
+// 文章回显
+export const artGetDetailService = (id) => {
+  request.get('/my/article/info', { params: { id } })
+}
+
+// 文章编辑
+export const artEditService = (data) => {
+  request.put('/my/article/info', data)
+}
+
+// 文章删除
+export const artDelService = (id) => {
+  request.delete('my/article/info', { params: { id } })
 }
